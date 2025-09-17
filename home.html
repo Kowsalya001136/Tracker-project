@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Home - BMI Calculator & Lifestyle Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        /* Reset */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            color: #333;
+            padding-top: 70px; /* space for fixed navbar */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Fixed top navigation bar */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            z-index: 1000;
+            user-select: none;
+        }
+        nav .logo {
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #fff;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        nav .features {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+        nav .feature-icon {
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        nav .feature-icon:hover,
+        nav .feature-icon:focus {
+            color: #a29bfe;
+            outline: none;
+        }
+        nav .feature-icon[tabindex="0"]:focus::after {
+            content: attr(aria-label);
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 10;
+        }
+        nav .username {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            user-select: text;
+        }
+
+        /* Main content */
+        main {
+            background: #fff;
+            max-width: 600px;
+            width: 100%;
+            border-radius: 16px;
+            padding: 40px 50px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #4b3f6b;
+            font-weight: 600;
+            font-size: 2rem;
+            margin-bottom: 25px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4b3f6b;
+            font-size: 1rem;
+        }
+        input[type="number"],
+        select {
+            padding: 12px 15px;
+            font-size: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
+            color: #4b3f6b;
+            margin-bottom: 20px;
+        }
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 8px rgba(108, 92, 231, 0.5);
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(108, 92, 231, 0.4);
+            transition: background 0.4s ease, box-shadow 0.4s ease;
+            user-select: none;
+        }
+        button:hover, button:focus {
+            background: linear-gradient(45deg, #a29bfe, #6c5ce7);
+            box-shadow: 0 12px 20px rgba(108, 92, 231, 0.6);
+            outline: none;
+        }
+        button:disabled {
+            background: #bbb;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Result and diet plan */
+        .result, .diet-plan {
+            margin-top: 30px;
+            padding: 25px 30px;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.15);
+            background: #f7f6ff;
+            color: #4b3f6b;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            position: relative;
+        }
+        .result strong, .diet-plan strong {
+            color: #6c5ce7;
+        }
+        .diet-plan {
+            background: #d6e9ff;
+            border-left: 6px solid #6c5ce7;
+            font-style: italic;
+        }
+
+        /* Feature icons section */
+        .features {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            flex: 1 1 100px;
+            max-width: 120px;
+            user-select: none;
+            color: white;
+        }
+        .feature-card:hover, .feature-card:focus {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            outline: none;
+        }
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
+        .feature-label {
+            font-weight: 600;
+            font-size: 1rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        /* Footer */
+        footer {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            color: #f0f0f5;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            user-select: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            main {
+                padding: 30px 25px;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            .feature-card {
+                max-width: 100px;
+                flex: 1 1 80px;
+            }
+            .feature-icon {
+                font-size: 36px;
+            }
+            .feature-label {
+                font-size: 0.9rem;
+            }
+            nav {
+                padding: 0 15px;
+            }
+            nav .feature-icon {
+                font-size: 20px;
+            }
+            nav .username {
+                font-size: 0.9rem;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+    <!-- Font Awesome CDN for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="logo" aria-label="Website title">Lifestyle Tracker</div>
+        <div class="features" role="menubar" aria-label="Feature navigation">
+            <i class="fas fa-music feature-icon" tabindex="0" role="menuitem" aria-label="Mood Music for Exercise" title="Mood Music for Exercise" onclick="alert('Open Mood Music for Exercise')" onkeypress="if(event.key==='Enter'){this.click();}"></i>
+            <i class="fas fa-robot feature-icon" tabindex="0" role="menuitem" aria-label="Motivation Chatbot" title="Motivation Chatbot" onclick="alert('Open Motivation Chatbot')" onkeypress="if(event.key==='Enter'){this.click();}"></i>
+            <i class="fas fa-utensils feature-icon" tabindex="0" role="menuitem" aria-label="Food Recommendation Bot" title="Food Recommendation Bot" onclick="alert('Open Food Recommendation Bot')" onkeypress="if(event.key==='Enter'){this.click();}"></i>
+            <i class="fas fa-venus feature-icon" tabindex="0" role="menuitem" aria-label="Period Tracker for Women" title="Period Tracker for Women" onclick="alert('Open Period Tracker for Women')" onkeypress="if(event.key==='Enter'){this.click();}"></i>
+        </div>
+        <div class="username" aria-live="polite" aria-atomic="true" id="usernameDisplay">User </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header>
+        <h1>Lifestyle Tracker</h1>
+        <p>Calculate your BMI and explore other features</p>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main" aria-label="BMI Calculator">
+        <h2>BMI Calculator</h2>
+        <form id="bmiForm" onsubmit="return processForm()" aria-describedby="formInstructions" novalidate>
+            <p id="formInstructions" style="color:#666; font-size:0.9rem; margin-bottom: 20px; text-align:center;">
+                Enter your details below to calculate your BMI and get personalized diet recommendations.
+            </p>
+
+            <label for="age">Age (years):</label>
+            <input type="number" id="age" name="age" min="1" max="120" required aria-required="true" aria-describedby="ageHelp" />
+            <small id="ageHelp" style="color:#666; font-size:0.8rem; margin-top:-15px; margin-bottom:15px; display:block;">Enter your age between 1 and 120.</small>
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender" required aria-required="true" aria-describedby="genderHelp">
+                <option value="" disabled selected>Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <small id="genderHelp" style="color:#666; font-size:0.8rem; margin-top:-15px; margin-bottom:15px; display:block;">Select your gender.</small>
+
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" name="weight" min="1" step="0.1" required aria-required="true" aria-describedby="weightHelp" />
+            <small id="weightHelp" style="color:#666; font-size:0.8rem; margin-top:-15px; margin-bottom:15px; display:block;">Enter your weight in kilograms.</small>
+
+            <label for="height">Height (cm):</label>
+            <input type="number" id="height" name="height" min="30" max="300" step="0.1" required aria-required="true" aria-describedby="heightHelp" />
+            <small id="heightHelp" style="color:#666; font-size:0.8rem; margin-top:-15px; margin-bottom:15px; display:block;">Enter your height in centimeters.</small>
+
+            <label for="disease">Personal Disease (if any):</label>
+            <select id="disease" name="disease" required aria-required="true" aria-describedby="diseaseHelp">
+                <option value="" disabled selected>Select disease or None</option>
+                <option value="None">None</option>
+                <option value="Diabetes">Diabetes</option>
+                <option value="Hypertension">Hypertension</option>
+                <option value="Heart Disease">Heart Disease</option>
+                <option value="Thyroid">Thyroid</option>
+                <option value="Obesity">Obesity</option>
+                <option value="Other">Other</option>
+            </select>
+            <small id="diseaseHelp" style="color:#666; font-size:0.8rem; margin-top:-15px; margin-bottom:15px; display:block;">Select your personal disease or None.</small>
+
+            <div class="buttons">
+                <button type="submit" aria-label="Calculate BMI and get recommendations">Calculate BMI & Get Recommendations</button>
+                <button type="button" id="resetBtn" aria-label="Reset form and clear results">Reset</button>
+            </div>
+        </form>
+
+        <section id="result" class="result" style="display:none;" aria-live="polite" aria-atomic="true"></section>
+        <section id="dietPlan" class="diet-plan" style="display:none;" aria-live="polite" aria-atomic="true"></section>
+    </main>
+
+    <!-- Other Features Section -->
+    <section class="features" aria-label="Other features">
+        <div class="feature-card" tabindex="0" role="button" aria-label="Mood Music for Exercise" onclick="alert('Open Mood Music for Exercise')" onkeypress="if(event.key==='Enter'){this.click();}">
+            <i class="fas fa-music feature-icon" aria-hidden="true"></i>
+            <div class="feature-label">Mood Music</div>
+        </div>
+        <div class="feature-card" tabindex="0" role="button" aria-label="Motivation Chatbot" onclick="alert('Open Motivation Chatbot')" onkeypress="if(event.key==='Enter'){this.click();}">
+            <i class="fas fa-robot feature-icon" aria-hidden="true"></i>
+            <div class="feature-label">Motivation Chatbot</div>
+        </div>
+        <div class="feature-card" tabindex="0" role="button" aria-label="Food Recommendation Bot" onclick="alert('Open Food Recommendation Bot')" onkeypress="if(event.key==='Enter'){this.click();}">
+            <i class="fas fa-utensils feature-icon" aria-hidden="true"></i>
+            <div class="feature-label">Food Bot</div>
+        </div>
+        <div class="feature-card" tabindex="0" role="button" aria-label="Period Tracker for Women" onclick="alert('Open Period Tracker for Women')" onkeypress="if(event.key==='Enter'){this.click();}">
+            <i class="fas fa-venus feature-icon" aria-hidden="true"></i>
+            <div class="feature-label">Period Tracker</div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2024 Lifestyle Tracker. All rights reserved.
+    </footer>
+
+    <script>
+        // Display username from localStorage or default
+        if (!localStorage.getItem('username')) {
+            localStorage.setItem('username', 'GuestUser ');
+        }
+        const username = localStorage.getItem('username');
+        document.getElementById('usernameDisplay').textContent = username;
+
+        // Process BMI form submission
+        function processForm() {
+            const age = parseInt(document.getElementById('age').value);
+            const gender = document.getElementById('gender').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const disease = document.getElementById('disease').value;
+
+            // Input validation
+            if (isNaN(age) || age < 1 || age > 120) {
+                alert('Please enter a valid age between 1 and 120.');
+                return false;
+            }
+            if (!gender) {
+                alert('Please select your gender.');
+                return false;
+            }
+            if (isNaN(weight) || weight <= 0) {
+                alert('Please enter a valid positive weight.');
+                return false;
+            }
+            if (isNaN(height) || height <= 0) {
+                alert('Please enter a valid positive height.');
+                return false;
+            }
+            if (!disease) {
+                alert('Please select your personal disease or None.');
+                return false;
+            }
+
+            // Calculate BMI
+            const heightM = height / 100;
+            const bmi = weight / (heightM *                 heightM);
+            const roundedBMI = bmi.toFixed(2);
+            // Determine BMI category
+            let bmiCategory = '';
+            if (bmi < 18.5) {
+                bmiCategory = 'Underweight';
+            } else if (bmi < 25) {
+                bmiCategory = 'Normal weight';
+            } else if (bmi < 30) {
+                bmiCategory = 'Overweight';
+            } else {
+                bmiCategory = 'Obesity';
+            }
+            // Disease status message
+            let diseaseStatus = '';
+            if (disease === 'None') {
+                diseaseStatus = 'No personal disease reported.';
+            } else {
+                 diseaseStatus = `Personal disease reported: ${disease}. Please consult your healthcare provider for personalized advice.`;
+            }
+            // Diet plan recommendations based on disease
+            const dietPlans = {
+                'None': 'Maintain a balanced diet rich in fruits, vegetables, whole grains, and lean proteins. Stay hydrated and exercise regularly.',
+                'Diabetes': 'Focus on low glycemic index foods, control carbohydrate intake, and avoid sugary drinks. Include fiber-rich foods and monitor blood sugar levels.',
+                'Hypertension': 'Reduce salt intake, eat plenty of fruits and vegetables, choose low-fat dairy products, and limit alcohol consumption.',
+                'Heart Disease': 'Adopt a heart-healthy diet with omega-3 fatty acids, reduce saturated fats, avoid trans fats, and increase intake of whole grains and nuts.',
+                'Thyroid': 'Include iodine-rich foods, selenium, and zinc. Avoid excessive soy and highly processed foods. Consult your doctor for supplements.',
+                'Obesity': 'Focus on calorie control, increase physical activity, eat nutrient-dense foods, and avoid high sugar and processed foods.',
+                'Other': 'Maintain a healthy, balanced diet and consult your healthcare provider for specific dietary recommendations.'
+            };
+            const dietPlanText = dietPlans[disease] || dietPlans['Other'];
+            // Show results
+            const resultDiv = document.getElementById('result');
+            const dietDiv = document.getElementById('dietPlan');
+            resultDiv.style.display = 'block';
+            dietDiv.style.display = 'block';
+              resultDiv.innerHTML = `
+                <p><strong>BMI:</strong> ${roundedBMI}</p>
+                <p><strong>Weight Status:</strong> ${bmiCategory}</p>
+                <p><strong>Disease Status:</strong> ${diseaseStatus}</p>
+            `;
+            dietDiv.innerHTML = `<strong>Recommended Diet Plan:</strong><br>${dietPlanText}`;
+            dietDiv.scrollIntoView({ behavior: 'smooth' });
+            return false; // prevent form submission
+        }
+    </script>
+    <!-- Font Awesome CDN for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>
